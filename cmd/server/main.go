@@ -7,6 +7,7 @@ import (
 	"os/signal"
 
 	"github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
+	"github.com/bootdotdev/learn-pub-sub-starter/internal/routing"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -29,7 +30,14 @@ func main() {
 	}
 
 	//publish message to exchange
-	err = pubsub.PublishJSON(ch,)
+	err = pubsub.PublishJSON(ch, 
+		routing.ExchangePerilDirect, 
+		routing.PauseKey, 
+		routing.PlayingState {IsPaused: true},
+	)
+	if err != nil {
+		log.Fatalf("unable to publish playing state: %v", err)
+	}
 
 	//wait for control+c
 	signalChan := make(chan os.Signal, 1)
