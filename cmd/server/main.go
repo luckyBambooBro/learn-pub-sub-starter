@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
-	"os/signal"
 
 	"github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
 	"github.com/bootdotdev/learn-pub-sub-starter/internal/routing"
@@ -38,10 +36,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to publish playing state: %v", err)
 	}
-
-	//wait for control+c
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt)
-	<-signalChan
-	fmt.Println("RabbitMQ connection closed...")	
+	fmt.Println("Pause message sent!")	
 }
