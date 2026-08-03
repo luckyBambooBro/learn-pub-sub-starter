@@ -50,7 +50,7 @@ func DeclareAndBind(
 		return &amqp.Channel{}, amqp.Queue{}, err
 	}
 
-	queue, err := ch.QueueDeclare(
+	qu, err := ch.QueueDeclare(
 		queueName,
 		false,
 		true,
@@ -70,5 +70,5 @@ func DeclareAndBind(
 		nil,
 	)
 
-	return ch, queue, nil
+	return ch, qu, nil
 }
