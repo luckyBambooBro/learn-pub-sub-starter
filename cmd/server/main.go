@@ -30,12 +30,12 @@ func main() {
 
 	gamelogic.PrintServerHelp()
 	for {
-		inputWords := gamelogic.GetInput()
-		if len(inputWords) == 0 {
+		words := gamelogic.GetInput()
+		if len(words) == 0 {
 			continue
 		}
 
-		switch inputWords[0] {
+		switch words[0] {
 		case "pause":
 				//publish message to exchange
 			err = pubsub.PublishJSON(ch, 
@@ -49,12 +49,16 @@ func main() {
 			fmt.Println("Pause message sent!")	
 		
 		case "resume":
-			pubsub.PublishJSON(
+			fmt.Println("Publishing resumes game state")
+			err = pubsub.PublishJSON(
 				ch, 
 				routing.ExchangePerilDirect, 
 				routing.PauseKey,
 				routing.PlayingState {IsPaused: false}, 
 			)
+			if err != nil {
+				log.Printf("could not publish time: %v", err)
+			}
 
 		case "quit":
 			log.Println("Exiting Peril")
