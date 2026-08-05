@@ -42,6 +42,8 @@ func main() {
 	}
 	fmt.Printf("Queue %v declared and bound!\n", queue.Name)
 
+	gamestate := gamelogic.NewGameState(username)
+
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, os.Interrupt)
 	<-signalCh
