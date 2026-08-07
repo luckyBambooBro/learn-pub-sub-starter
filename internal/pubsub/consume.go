@@ -67,5 +67,5 @@ func SubscribeJSON[T any](
 	}
 
 	//pages, err := c.Consume("page", "pager", false, false, false, false, nil)
-	
+	messages := ch.Consume
 }
