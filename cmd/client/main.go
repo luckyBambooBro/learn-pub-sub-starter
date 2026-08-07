@@ -42,7 +42,7 @@ func main() {
 	}
 	fmt.Printf("Queue %v declared and bound!\n", queue.Name)
 
-	gamestate := gamelogic.NewGameState(username)
+	gs := gamelogic.NewGameState(username)
 
 	for {
 		words := gamelogic.GetInput()
@@ -52,14 +52,14 @@ func main() {
 
 		switch words[0] {
 		case "spawn":
-			err := gamestate.CommandSpawn(words)
+			err := gs.CommandSpawn(words)
 			if err != nil {
 				fmt.Printf("command spawn error: %v\n", err)
 				continue
 			}
 		
 		case "move":
-			_, err := gamestate.CommandMove(words)
+			_, err := gs.CommandMove(words)
 			if err != nil {
 				fmt.Printf("invalid move command: %v\n", err)
 				continue
@@ -67,7 +67,7 @@ func main() {
 			fmt.Printf("move: %v %v successful\n", words[1], words[2])
 
 		case "status":
-			gamestate.CommandStatus()
+			gs.CommandStatus()
 
 
 		case "help":
@@ -83,12 +83,4 @@ func main() {
 			fmt.Println("unknown command")
 		}
 	}
-
-	/*
-	signalCh := make(chan os.Signal, 1)
-	signal.Notify(signalCh, os.Interrupt)
-	<-signalCh
-	fmt.Println("RabbitMQ connection closed.")
-	*/
-
 }
