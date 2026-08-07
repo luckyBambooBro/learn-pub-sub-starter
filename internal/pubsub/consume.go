@@ -52,3 +52,20 @@ func DeclareAndBind(
 
 	return ch, qu, nil
 }
+
+func SubscribeJSON[T any](
+    conn *amqp.Connection,
+    exchange,
+    queueName,
+    key string,
+    queueType SimpleQueueType, // an enum to represent "durable" or "transient"
+    handler func(T),
+) error {
+	ch, queue, err := DeclareAndBind(conn, exchange, queueName, key, queueType)
+	if err != nil {
+		return fmt.Errorf("error subscribing to queue: %v", err)
+	}
+
+	//pages, err := c.Consume("page", "pager", false, false, false, false, nil)
+	
+}
