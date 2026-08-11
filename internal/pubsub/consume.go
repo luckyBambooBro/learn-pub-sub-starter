@@ -1,7 +1,9 @@
 package pubsub
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -61,11 +63,31 @@ func SubscribeJSON[T any](
     queueType SimpleQueueType, // an enum to represent "durable" or "transient"
     handler func(T),
 ) error {
-	ch, queue, err := DeclareAndBind(conn, exchange, queueName, key, queueType)
+
+	ch, _, err := DeclareAndBind(conn, exchange, queueName, key, queueType)
 	if err != nil {
 		return fmt.Errorf("error subscribing to queue: %v", err)
 	}
 
 	//pages, err := c.Consume("page", "pager", false, false, false, false, nil)
-	messages := ch.Consume
+	deliveries, err := ch.Consume(queueName, "", false, false, false, false, nil) //returns (<-chan amqp.Delivery, error)
+	if err != nil {
+		return fmt.Errorf("unable to consume messages from queue: %v", err)
+	}
+
+	go func() {
+		for delivery := range deliveries {
+			var message T
+			err := json.Unmarshal(delivery.Body, &message) 
+			if err != nil {
+				log.Printf("unable to unmarshal message from <-chan amqp.Delivery for %v: %v", delivery.ConsumerTag, err)
+				continue
+			}
+
+			handler(message)
+			delivery.Ack(false)
+		}
+	}()
+
+	return nil
 }
