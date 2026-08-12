@@ -75,6 +75,7 @@ func SubscribeJSON[T any](
 		return fmt.Errorf("unable to consume messages from queue: %v", err)
 	}
 
+
 	go func() {
 		for delivery := range deliveries {
 			var message T

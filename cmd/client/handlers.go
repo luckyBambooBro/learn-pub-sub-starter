@@ -1,4 +1,4 @@
-package client
+package main
 
 import (
 	"fmt"
@@ -8,8 +8,9 @@ import (
 )
 
 func handlerPause(gs *gamelogic.GameState) func(routing.PlayingState) {
-	defer fmt.Print("> ")
-	gs.HandlePause(routing.PlayingState{IsPaused: true})
-
+	return func(ps routing.PlayingState) {
+		defer fmt.Print("> ")
+		gs.HandlePause(ps)
+	}
 	
 }
