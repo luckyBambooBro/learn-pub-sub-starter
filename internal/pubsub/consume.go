@@ -75,11 +75,16 @@ func SubscribeJSON[T any](
 		return fmt.Errorf("unable to consume messages from queue: %v", err)
 	}
 
+	unmarshaller := func(data []byte) (T, error) {
+		var target T
+		err := json.Unmarshal(data, target)
+		return target, err
+	}
 
 	go func() {
+		defer ch.Close()
 		for delivery := range deliveries {
-			var message T
-			err := json.Unmarshal(delivery.Body, &message) 
+			message, err := unmarshaller(delivery.Body)
 			if err != nil {
 				log.Printf("unable to unmarshal message from <-chan amqp.Delivery for %v: %v", delivery.ConsumerTag, err)
 				continue
