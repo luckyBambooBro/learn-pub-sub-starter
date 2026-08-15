@@ -44,13 +44,13 @@ func main() {
 		log.Fatalf("could not subscribe to pause: %v", err)
 	}
 
-	err =pubsub.SubscribeJSON(
+	err = pubsub.SubscribeJSON(
 		conn,
 		routing.ExchangePerilTopic,
 		routing.ArmyMovesPrefix + "." + username,
 		routing.ArmyMovesPrefix + ".*",
 		pubsub.SimpleQueueTransient,
-		
+		handlerMove(gs),
 	)
 
 
