@@ -14,3 +14,5 @@ func handlerPause(gs *gamelogic.GameState) func(routing.PlayingState) {
 	}
 	
 }
+
+func handlerMove(gs *gamelogic.GameState) func
