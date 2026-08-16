@@ -77,7 +77,7 @@ func SubscribeJSON[T any](
 
 	unmarshaller := func(data []byte) (T, error) {
 		var target T
-		err := json.Unmarshal(data, target)
+		err := json.Unmarshal(data, &target)
 		return target, err
 	}
 

@@ -25,6 +25,11 @@ func main() {
 	defer conn.Close()
 	fmt.Println("Peril game client connected to RabbitMQ!")
 
+	ch, err := conn.Channel()
+		if err != nil {
+			log.Printf("channel connection error: %v", err)
+		}
+
 	username, err := gamelogic.ClientWelcome()
 	if err != nil {
 		log.Fatalf("unable to obtain username: %v", err)
@@ -47,7 +52,7 @@ func main() {
 	err = pubsub.SubscribeJSON(
 		conn,
 		routing.ExchangePerilTopic,
-		routing.ArmyMovesPrefix + "." + username,
+		routing.ArmyMovesPrefix + "." + gs.GetUsername(),
 		routing.ArmyMovesPrefix + ".*",
 		pubsub.SimpleQueueTransient,
 		handlerMove(gs),
@@ -74,11 +79,7 @@ func main() {
 				fmt.Printf("invalid move command: %v\n", err)
 				continue
 			}
-			ch, err := conn.Channel()
-			if err != nil {
-				log.Printf("client \"move\" error: %v", err)
-				continue
-			}
+
 			err = pubsub.PublishJSON(
 				ch,
 				routing.ExchangePerilTopic,
