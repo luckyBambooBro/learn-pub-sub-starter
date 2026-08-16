@@ -69,9 +69,24 @@ func main() {
 			}
 		
 		case "move":
-			_, err := gs.CommandMove(words)
+			m, err := gs.CommandMove(words)
 			if err != nil {
 				fmt.Printf("invalid move command: %v\n", err)
+				continue
+			}
+			ch, err := conn.Channel()
+			if err != nil {
+				log.Printf("client \"move\" error: %v", err)
+				continue
+			}
+			err = pubsub.PublishJSON(
+				ch,
+				routing.ExchangePerilTopic,
+				routing.ArmyMovesPrefix + "." + username,
+				m,
+			)
+			if err != nil {
+				log.Printf("err publishing method in client \"move\": %v", err)
 				continue
 			}
 			fmt.Printf("move: %v %v successful\n", words[1], words[2])
