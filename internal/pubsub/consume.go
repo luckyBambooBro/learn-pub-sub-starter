@@ -37,13 +37,20 @@ func DeclareAndBind(
 		return nil, amqp.Queue{}, err
 	}
 
+	/*
+	It should pass in an amqp.Table to the QueueDeclare function that includes a x-dead-letter-exchange 
+	key. The value should be the name of your dead letter exchange. This will tell RabbitMQ to send 
+	failed messages to the dead letter exchange.*/
+
 	qu, err := ch.QueueDeclare(
 		queueName,
 		queueType == SimpleQueueDurable,
 		queueType != SimpleQueueDurable,
 		queueType != SimpleQueueDurable,
 		false,
-		nil,
+		amqp.Table{
+			"x-dead-letter-exchange": "peril.dlx",
+		},
 	)
 	if err != nil {
 		return nil, amqp.Queue{}, err
