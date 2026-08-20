@@ -55,7 +55,7 @@ func main() {
 		routing.ArmyMovesPrefix + "." + gs.GetUsername(),
 		routing.ArmyMovesPrefix + ".*",
 		pubsub.SimpleQueueTransient,
-		handlerMove(gs),
+		handlerMove(gs, ch),
 	)
 
 

@@ -43,3 +43,8 @@ func handlerMove(gs *gamelogic.GameState, ch *amqp.Channel) func(gamelogic.ArmyM
 		}
 	}
 }
+
+//func (gs *GameState) HandleWar(rw RecognitionOfWar) (outcome WarOutcome, winner string, loser string)
+func handlerWarMove(gs *gamelogic.GameState) func()pubsub.Acktype {
+
+}
