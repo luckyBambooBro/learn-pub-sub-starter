@@ -74,7 +74,7 @@ func main() {
 			}
 		
 		case "move":
-			m, err := gs.CommandMove(words)
+			mv, err := gs.CommandMove(words)
 			if err != nil {
 				fmt.Printf("invalid move command: %v\n", err)
 				continue
@@ -84,7 +84,7 @@ func main() {
 				ch,
 				routing.ExchangePerilTopic,
 				routing.ArmyMovesPrefix + "." + username,
-				m,
+				mv,
 			)
 			if err != nil {
 				log.Printf("err publishing method in client \"move\": %v", err)

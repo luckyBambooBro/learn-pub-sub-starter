@@ -49,7 +49,7 @@ func DeclareAndBind(
 		queueType != SimpleQueueDurable,
 		false,
 		amqp.Table{
-			"x-dead-letter-exchange": "peril.dlx",
+			"x-dead-letter-exchange": "peril_dlx",
 		},
 	)
 	if err != nil {
