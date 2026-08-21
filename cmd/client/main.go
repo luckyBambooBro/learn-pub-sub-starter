@@ -64,13 +64,13 @@ func main() {
 	err = pubsub.SubscribeJSON(
 		conn,
 		routing.ExchangePerilTopic,
-		routing.WarRecognitionsPrefix + "." + gs.GetUsername(),
+		routing.WarRecognitionsPrefix,
 		routing.WarRecognitionsPrefix + ".*",
-		pubsub.SimpleQueueTransient,
+		pubsub.SimpleQueueDurable,
 		handlerWarMove(gs),
 	)
 	if err != nil {
-		log.Fatalf("could not subscribe to war: %v", err)
+		log.Fatalf("could not subscribe to war declarations: %v", err)
 	}
 
 
