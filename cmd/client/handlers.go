@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/bootdotdev/learn-pub-sub-starter/internal/gamelogic"
 	"github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
@@ -44,10 +45,27 @@ func handlerMove(gs *gamelogic.GameState, ch *amqp.Channel) func(gamelogic.ArmyM
 	}
 }
 
-//func (gs *GameState) HandleWar(rw RecognitionOfWar) (outcome WarOutcome, winner string, loser string)
+
 func handlerWarMove(gs *gamelogic.GameState) func(gamelogic.RecognitionOfWar)pubsub.Acktype {
 	return func(rw gamelogic.RecognitionOfWar) pubsub.Acktype {
 		defer fmt.Print("> ")
-		outcome, winner, loser := gs.HandleWar(rw)
+		outcome, _, _ := gs.HandleWar(rw)
+
+		switch outcome {
+		case gamelogic.WarOutcomeNotInvolved:
+			return pubsub.NackRequeue
+		case gamelogic.WarOutcomeNoUnits:
+			return pubsub.NackDiscard
+		case gamelogic.WarOutcomeOpponentWon:
+			return pubsub.Ack
+		case gamelogic.WarOutcomeYouWon:
+			return pubsub.Ack
+		case gamelogic.WarOutcomeDraw:
+			return pubsub.Ack
+		default:
+			log.Panicln("error - unknown war outcome")
+			return pubsub.NackDiscard
+
+		}
 	}
 }

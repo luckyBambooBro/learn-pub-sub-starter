@@ -57,6 +57,21 @@ func main() {
 		pubsub.SimpleQueueTransient,
 		handlerMove(gs, ch),
 	)
+	if err != nil {
+		log.Fatalf("could not subscribe to move: %v", err)
+	}
+
+	err = pubsub.SubscribeJSON(
+		conn,
+		routing.ExchangePerilTopic,
+		routing.WarRecognitionsPrefix + "." + gs.GetUsername(),
+		routing.WarRecognitionsPrefix + ".*",
+		pubsub.SimpleQueueTransient,
+		handlerWarMove(gs),
+	)
+	if err != nil {
+		log.Fatalf("could not subscribe to war: %v", err)
+	}
 
 
 	for {
