@@ -81,7 +81,7 @@ func handlerWarMove(gs *gamelogic.GameState, ch *amqp.Channel) func(gamelogic.Re
 			Username: gs.GetUsername(),
 		}
 
-		err := PublishGameLog(gs, ch, gl)
+		err := PublishGameLog(ch, rw.Attacker.Username, gl)
 		if err != nil {
 			return pubsub.NackRequeue
 		}
@@ -89,11 +89,11 @@ func handlerWarMove(gs *gamelogic.GameState, ch *amqp.Channel) func(gamelogic.Re
 	}
 }
 
-func PublishGameLog(gs *gamelogic.GameState, ch *amqp.Channel, val routing.GameLog) error {
+func PublishGameLog(ch *amqp.Channel, username string, gl routing.GameLog) error {
 	return pubsub.PublishGob(
 		ch,
 		routing.ExchangePerilTopic,
-		routing.GameLogSlug + "." + gs.GetUsername(),
-		val,
+		routing.GameLogSlug + "." + username,
+		gl,
 	)
 }
