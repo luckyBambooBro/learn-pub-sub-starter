@@ -123,3 +123,14 @@ func SubscribeJSON[T any](
 
 	return nil
 }
+
+func SubscribeGob[T any] (
+    conn *amqp.Connection,
+    exchange,
+    queueName,
+    key string,
+    queueType SimpleQueueType, // an enum to represent "durable" or "transient"
+    handler func(T) Acktype,
+) error {
+	
+}
