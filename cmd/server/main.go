@@ -28,18 +28,33 @@ func main() {
 		log.Fatalf("failed to open AMQP channel: %v", err)
 	}
 
-	_, queue, err := pubsub.DeclareAndBind(
+	/* _, queue, err := pubsub.DeclareAndBind(
 		conn,
 		routing.ExchangePerilTopic,
 		routing.GameLogSlug,
 		routing.GameLogSlug + ".*",
 		pubsub.SimpleQueueDurable,
+	) */
+
+	err = pubsub.SubscribeGob(
+		conn,
+		routing.ExchangePerilTopic,
+		routing.GameLogSlug,
+		routing.GameLogSlug + ".*",
+		pubsub.SimpleQueueDurable,
+		func(gl routing.GameLog) pubsub.Acktype {
+			defer fmt.Print("> ")
+			err := gamelogic.WriteLog(gl)
+			if err != nil {
+				return pubsub.NackRequeue
+			}
+			return pubsub.Ack
+		},
 	)
 
 	if err != nil {
-		log.Fatalf("could not subscribe to pause: %v", err)
+		log.Fatalf("could not subscribe server to gamelogs: %v", err)
 	}
-	fmt.Printf("Queue %v declared and bound!\n", queue.Name)
 
 
 	gamelogic.PrintServerHelp()

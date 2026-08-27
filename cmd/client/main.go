@@ -125,3 +125,12 @@ func main() {
 		}
 	}
 }
+
+func PublishGameLog(ch *amqp.Channel, username string, gl routing.GameLog) error {
+	return pubsub.PublishGob(
+		ch,
+		routing.ExchangePerilTopic,
+		routing.GameLogSlug + "." + username,
+		gl,
+	)
+}

@@ -1,6 +1,8 @@
 package pubsub
 
 import (
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -79,7 +81,61 @@ func SubscribeJSON[T any](
     queueType SimpleQueueType, // an enum to represent "durable" or "transient"
     handler func(T) Acktype,
 ) error {
+	unmarshaller := func(data []byte) (T, error) {
+		var target T
+		err := json.Unmarshal(data, &target)
+		return target, err
+	}
 
+	return subscribe(
+		conn,
+		exchange,
+		queueName,
+		key,
+		queueType,
+		handler,
+		unmarshaller,)
+}
+
+func SubscribeGob[T any] (
+    conn *amqp.Connection,
+    exchange,
+    queueName,
+    key string,
+    queueType SimpleQueueType, // an enum to represent "durable" or "transient"
+    handler func(T) Acktype,
+) error {
+	unmarshaller := func(data []byte) (T, error) {
+		reader := bytes.NewReader(data)
+		dec := gob.NewDecoder(reader)
+		var message T
+		err := dec.Decode(&message)
+		if err != nil {
+			return message, err
+		}
+		return message, nil
+	}
+
+	return subscribe(
+		conn,
+		exchange,
+		queueName,
+		key,
+		queueType,
+		handler,
+		unmarshaller,)
+
+}
+
+func subscribe[T any] (
+    conn *amqp.Connection,
+    exchange,
+    queueName,
+    key string,
+    queueType SimpleQueueType, // an enum to represent "durable" or "transient"
+    handler func(T) Acktype,
+	unmarshaller func([]byte) (T, error),
+) error {
 	ch, _, err := DeclareAndBind(conn, exchange, queueName, key, queueType)
 	if err != nil {
 		return fmt.Errorf("error subscribing to queue: %v", err)
@@ -91,12 +147,7 @@ func SubscribeJSON[T any](
 		return fmt.Errorf("unable to consume messages from queue: %v", err)
 	}
 
-	unmarshaller := func(data []byte) (T, error) {
-		var target T
-		err := json.Unmarshal(data, &target)
-		return target, err
-	}
-
+	
 	go func() {
 		defer ch.Close()
 		for delivery := range deliveries {
@@ -122,15 +173,4 @@ func SubscribeJSON[T any](
 	}()
 
 	return nil
-}
-
-func SubscribeGob[T any] (
-    conn *amqp.Connection,
-    exchange,
-    queueName,
-    key string,
-    queueType SimpleQueueType, // an enum to represent "durable" or "transient"
-    handler func(T) Acktype,
-) error {
-	
 }
