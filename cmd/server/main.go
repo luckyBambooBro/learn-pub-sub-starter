@@ -35,7 +35,7 @@ func main() {
 		routing.GameLogSlug + ".*",
 		pubsub.SimpleQueueDurable,
 	) */
-
+ 
 	err = pubsub.SubscribeGob(
 		conn,
 		routing.ExchangePerilTopic,
