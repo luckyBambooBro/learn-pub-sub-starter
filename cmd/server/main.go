@@ -27,14 +27,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to open AMQP channel: %v", err)
 	}
-
-	/* _, queue, err := pubsub.DeclareAndBind(
-		conn,
-		routing.ExchangePerilTopic,
-		routing.GameLogSlug,
-		routing.GameLogSlug + ".*",
-		pubsub.SimpleQueueDurable,
-	) */
  
 	err = pubsub.SubscribeGob(
 		conn,
@@ -42,14 +34,7 @@ func main() {
 		routing.GameLogSlug,
 		routing.GameLogSlug + ".*",
 		pubsub.SimpleQueueDurable,
-		func(gl routing.GameLog) pubsub.Acktype {
-			defer fmt.Print("> ")
-			err := gamelogic.WriteLog(gl)
-			if err != nil {
-				return pubsub.NackRequeue
-			}
-			return pubsub.Ack
-		},
+		HandlerLogs(),
 	)
 
 	if err != nil {
