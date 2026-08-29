@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"time"
 
 	//"os"
 	//"os/signal"
@@ -115,8 +117,31 @@ func main() {
 			gamelogic.PrintClientHelp()
 
 		case "spam":
-			fmt.Println("Spamming not allowed yet!")
+			if len(words) < 2 {
+				fmt.Println("usage: spam <number>")
+				continue
+			}
+			n, err := strconv.Atoi(words[1])
+			if err != nil {
+				log.Printf("error converting string to int: %v", err)
+				continue
+			}
 
+			for i := 0; i < n; i++ {
+				maliciousLog := gamelogic.GetMaliciousLog()
+				err = PublishGameLog(
+					ch, 
+					gs.GetUsername(), 
+					routing.GameLog {
+						CurrentTime: time.Now(),
+						Message: maliciousLog,
+						Username: gs.GetUsername(),
+					})
+				if err != nil {
+					log.Printf("spam command error: %v", err)
+				}
+			}
+			
 		case "quit":
 			gamelogic.PrintQuit()
 
